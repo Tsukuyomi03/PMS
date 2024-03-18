@@ -1,7 +1,25 @@
 <?php
 include ("assets/php/config.php");
-session_start()
-    ?>
+session_start();
+if (!isset ($_SESSION['Username'])) {
+    header("Location: ../index.php");
+    exit();
+
+} else {
+    $user = $_SESSION['Username'];
+    $data1 = '';
+    $data2 = '';
+    $sql = "SELECT  DATE_FORMAT(`Sales_Date`,'%m-%d-%y') AS `Current`, SUM(`Sales_Quantity`) AS `Total` FROM `tbl_saleseggs`  WHERE `Sales_User`='$user' GROUP BY `Current`";
+    $result = mysqli_query($db, $sql);
+    while ($row = mysqli_fetch_array($result)) {
+
+        $data1 = $data1 . '"' . $row['Current'] . '",';
+        $data2 = $data2 . '"' . $row['Total'] . '",';
+    }
+    $data1 = trim($data1, ",");
+    $data2 = trim($data2, ",");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,6 +45,25 @@ session_start()
 </head>
 
 <body class="g-sidenav-show  bg-gray-100" onload="loadAll();">
+    <div>
+        <?php if (isset ($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    text: '<?php echo $_SESSION['message'] ?>',
+                })
+            </script>
+        <?php elseif (isset ($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    text: '<?php echo $_SESSION['message'] ?>',
+                })
+            </script>
+        <?php endif; ?>
+        <?php unset($_SESSION['message']); ?>
+        <?php unset($_SESSION['status']); ?>
+    </div>
     <aside
         class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark"
         id="sidenav-main">
@@ -87,7 +124,7 @@ session_start()
                                     </div>
                                     <div class="text-end pt-1">
                                         <p class="text-sm mb-0 text-capitalize">Total Egg Sold</p>
-                                        <h4 class="mb-0" id="">0</h4>
+                                        <h4 class="mb-0" id="totalEggSold">0</h4>
                                     </div>
                                 </div>
                                 <hr class="dark horizontal my-0">
@@ -102,7 +139,7 @@ session_start()
                                     </div>
                                     <div class="text-end pt-1">
                                         <p class="text-sm mb-0 text-capitalize">Total Sales</p>
-                                        <h4 class="mb-0" id="">0</h4>
+                                        <h4 class="mb-0" id="totalSalesCounter">0</h4>
                                     </div>
                                 </div>
                                 <hr class="dark horizontal my-0">
@@ -154,9 +191,7 @@ session_start()
                                 <div class="card-body p-3">
                                     <div class="row">
                                         <div class="col-lg-12 col-md-7">
-                                            <div class="table-responsive">
-
-                                            </div>
+                                            <canvas id="mychart"></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -218,11 +253,15 @@ session_start()
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
         integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
         function loadAll() {
-            loadSalesTable()
+            loadSalesTable();
+            loadTotalEggs();
+            loadTotalSales();
+            loadChart();
         }
         function logout() {
             Swal.fire({
@@ -282,7 +321,83 @@ session_start()
                 cache: false,
                 success: function (data) {
                     $('#tblSales').html(data);
-                    var table = $('#tblSales').DataTable();
+                    var table = $('#tblSales').DataTable({
+                        order: [[4, 'desc']]
+                    });
+                }
+            });
+        }
+        function loadTotalEggs() {
+            $.ajax({
+                url: 'assets/php/load_total_egg.php',
+                success: function (data) {
+                    document.getElementById("totalEggSold").textContent = data;
+                }
+            })
+        }
+        function loadTotalSales() {
+            $.ajax({
+                url: 'assets/php/load_total_sales.php',
+                success: function (data) {
+                    document.getElementById("totalSalesCounter").textContent = data;
+                }
+            })
+        }
+        function deleteSales($___id) {
+            Swal.fire({
+                title: 'CONFIRMATION',
+                text: "Delete this Data?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'assets/php/delete_sales.php?id=' + $___id;
+                }
+            })
+
+        }
+        function loadChart() {
+            var ctx = document.getElementById("mychart").getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    color: "pink",
+                    labels: [<?php echo $data1; ?>],
+                    datasets: [
+                        {
+                            label: 'Egg Sold',
+                            data: [<?php echo $data2; ?>,],
+                            backgroundColor: 'transparent',
+                            borderColor: 'Pink',
+                            borderWidth: 3,
+                            tension: 0.1,
+
+                        },
+                    ]
+                },
+                animation: {
+                    animateScale: true
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: false,
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function (value) {
+                                    if (Number.isInteger(value)) {
+                                        return value;
+                                    }
+                                },
+                            }
+                        }],
+                    }
                 }
             });
         }

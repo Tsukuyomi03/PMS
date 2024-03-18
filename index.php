@@ -1,6 +1,21 @@
 <?php
-include("assets/php/config.php");
+include ("assets/php/config.php");
 session_start();
+if (isset ($_SESSION['Username'])) {
+    $user = $_SESSION['Username'];
+    $sql = "SELECT * FROM tbl_users WHERE Username='$user'";
+    $result = $db->query($sql);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        if ($row['Type'] == 1) {
+            header("Location: poultry_chicken/poultry_dashboard.php");
+        } else if ($row['Type'] == 2) {
+            header("Location: poultry_egg/poultry_dashboard.php");
+        } else {
+            header("Location: poultry_both/poultry_dashboard.php");
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,14 +34,14 @@ session_start();
 
 <body>
     <div>
-        <?php if (isset($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
+        <?php if (isset ($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
             <script>
                 Swal.fire({
                     icon: 'success',
                     text: '<?php echo $_SESSION['message'] ?>',
                 })
             </script>
-        <?php elseif (isset($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
+        <?php elseif (isset ($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
             <script>
                 Swal.fire({
                     icon: 'error',

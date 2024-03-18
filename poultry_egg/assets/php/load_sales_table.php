@@ -14,7 +14,7 @@ session_start();
 <tbody>
     <?php
     $user = $_SESSION["Username"];
-    $sql = "SELECT * FROM `tbl_saleseggs` WHERE Sales_User = '$user'";
+    $sql = "SELECT * FROM `tbl_saleseggs` WHERE Sales_User = '$user' ORDER BY `Sales_Date` DESC";
     $result = $db->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -33,7 +33,7 @@ session_start();
                     <?= $row['Sales_Total']; ?>
                 </td>
                 <td>
-                    <button class="btn btn-danger btn-sm">DELETE</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSales(<?= $row['Sales_ID']; ?>);">DELETE</button>
                 </td>
             </tr>
             <?php
