@@ -272,7 +272,9 @@ session_start();
                                                     <td>
                                                         <?= $row['Surname']; ?>
                                                     </td>
-                                                    <td><button class="btn btn-success btn-sm">View</button>
+                                                    <td>
+                                                        <a href="assets/php/redirect_page.php?id=<?= $row['User_ID']; ?>"
+                                                            class="btn btn-success btn-sm">View</a>
                                                     </td>
                                                 </tr>
                                             <?php } ?>

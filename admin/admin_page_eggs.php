@@ -1,12 +1,18 @@
 <?php
 include ("assets/php/config.php");
 session_start();
-if (!isset ($_SESSION['Username'])) {
-    header("Location: ../index.php");
-    exit();
 
-} else {
-    $user = $_SESSION['Username'];
+$id = $_GET['id'];
+$sql = "SELECT * FROM tbl_users WHERE User_ID='$id'";
+$result = $db->query($sql);
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $user = $row['Username'];
+    $dc = $row['Date_Created'];
+    $name = $row['Name'];
+    $sname = $row['Surname'];
+    $add = $row['Address'];
+    $contact = $row['Contact'];
     $data1 = '';
     $data2 = '';
     $sql = "SELECT  DATE_FORMAT(`Sales_Date`,'%m-%d-%y') AS `Current`, SUM(`Sales_Quantity`) AS `Total` FROM `tbl_saleseggs`  WHERE `Sales_Date` BETWEEN CURDATE()-7 AND CURDATE() AND `Sales_User`='$user' GROUP BY `Current`";
@@ -18,7 +24,10 @@ if (!isset ($_SESSION['Username'])) {
     }
     $data1 = trim($data1, ",");
     $data2 = trim($data2, ",");
+} else {
+    header("Location: " . $path . "admin/admin_users.php");
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,25 +54,6 @@ if (!isset ($_SESSION['Username'])) {
 </head>
 
 <body class="g-sidenav-show  bg-gray-100" onload="loadAll();">
-    <div>
-        <?php if (isset ($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    text: '<?php echo $_SESSION['message'] ?>',
-                })
-            </script>
-        <?php elseif (isset ($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
-            <script>
-                Swal.fire({
-                    icon: 'error',
-                    text: '<?php echo $_SESSION['message'] ?>',
-                })
-            </script>
-        <?php endif; ?>
-        <?php unset($_SESSION['message']); ?>
-        <?php unset($_SESSION['status']); ?>
-    </div>
     <aside
         class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark"
         id="sidenav-main">
@@ -72,7 +62,7 @@ if (!isset ($_SESSION['Username'])) {
                 aria-hidden="true" id="iconSidenav"></i>
             <a class="navbar-brand m-0" href="admin_dashboard.php" target="_blank">
                 <span class="ms-1 font-weight-bold text-white">
-                    <?php echo $_SESSION['Username'] ?>
+                    ADMIN
                 </span>
             </a>
         </div>
@@ -80,11 +70,19 @@ if (!isset ($_SESSION['Username'])) {
         <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link text-white " href="poultry_dashboard.php">
+                    <a class="nav-link text-white " href="admin_dashboard.php">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa-solid fa-table-columns"></i>
                         </div>
                         <span class="nav-link-text ms-1">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white " href="admin_users.php">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Users</span>
                     </a>
                 </li>
             </ul>
@@ -102,11 +100,12 @@ if (!isset ($_SESSION['Username'])) {
             <div class="container-fluid py-1 px-3">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-                        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">
-                                <?php echo $_SESSION['Username'] ?>
-                            </a>
+                        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Admin</a>
                         </li>
-                        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Dashboard</li>
+                        <li class="breadcrumb-item text-sm text-dark" aria-current="page">Dashboard</li>
+                        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">
+                            <?php echo $user ?>
+                        </li>
                     </ol>
                 </nav>
             </div>
@@ -114,7 +113,54 @@ if (!isset ($_SESSION['Username'])) {
         <div class="container-fluid py-4">
             <div class="row">
                 <div class="col-lg-6 position-relative z-index-2">
-                    <div class="row">
+                    <a class="btn btn-secondary" href="admin_users.php"> <i class="fa-solid fa-backward"></i> GO
+                        BACK</a>
+                    <div class="row" style="margin-top:2%">
+                        <div class="col-12">
+                            <div class="card mb-4 ">
+                                <div class="d-flex flex-row">
+                                    <div
+                                        class="icon icon-shape icon-lg bg-gradient-primary shadow text-center border-radius-xl mt-n3 ms-4">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <h6 class="mt-3 mb-2 ms-3 ">USER PROFILE :
+                                        <?php echo $user ?>
+                                    </h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-7">
+                                            <table class="table">
+                                                <tr>
+                                                    <td>Full Name :
+                                                        <?php echo $name ?>
+                                                        <?php echo $sname ?>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Address :
+                                                        <?php echo $add ?>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Contact No :
+                                                        <?php echo $contact ?>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>User Type : Egg Seller
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row" style="margin-top:2%">
                         <div class="col-lg-6 col-sm-3">
                             <div class="card  mb-2">
                                 <div class="card-header p-3 pt-2">
@@ -124,7 +170,14 @@ if (!isset ($_SESSION['Username'])) {
                                     </div>
                                     <div class="text-end pt-1">
                                         <p class="text-sm mb-0 text-capitalize">Total Egg Sold</p>
-                                        <h4 class="mb-0" id="totalEggSold">0</h4>
+                                        <?php
+                                        $sql4 = "SELECT SUM(`Sales_Quantity`) AS total_qty FROM `tbl_saleseggs` WHERE `Sales_User` = '$user'";
+                                        $result4 = $db->query($sql4);
+                                        $row4 = $result4->fetch_assoc();
+                                        ?>
+                                        <h4 class="mb-0" id="totalEggSold">
+                                            <?php echo $row4['total_qty']; ?>
+                                        </h4>
                                     </div>
                                 </div>
                                 <hr class="dark horizontal my-0">
@@ -139,42 +192,19 @@ if (!isset ($_SESSION['Username'])) {
                                     </div>
                                     <div class="text-end pt-1">
                                         <p class="text-sm mb-0 text-capitalize">Total Sales</p>
-                                        <h4 class="mb-0" id="totalSalesCounter">0</h4>
+                                        <?php
+                                        $sql6 = "SELECT SUM(`Sales_Total`) AS total_sales FROM `tbl_saleseggs` WHERE `Sales_User` = '$user'";
+                                        $result6 = $db->query($sql6);
+                                        $row6 = $result6->fetch_assoc();
+                                        ?>
+                                        <h4 class="mb-0" id="totalSalesCounter">
+                                            <?php echo $row6['total_sales']; ?>
+                                        </h4>
                                     </div>
                                 </div>
                                 <hr class="dark horizontal my-0">
                             </div>
                         </div>
-                    </div>
-                    <button class="btn btn-primary" style="float:right;margin-top:2%; margin-left: 2%;"
-                        data-bs-toggle="modal" data-bs-target="#addSales">Add Sales</button>
-                    <br>
-                    <br>
-                    <br>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card mb-4 ">
-                                <div class="d-flex flex-row">
-                                    <div
-                                        class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
-                                        <i class="fa-solid fa-chart-line"></i>
-                                    </div>
-                                    <h6 class="mt-3 mb-2 ms-3 ">Sales Logs</h6>
-                                </div>
-                                <div class="card-body p-3">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-7">
-                                            <div class="table-responsive" id="containerSalesTable">
-                                                <table class="table table-bordered" id="tblSales" style="width:100%">
-
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -186,7 +216,7 @@ if (!isset ($_SESSION['Username'])) {
                                         class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
                                         <i class="fa-solid fa-chart-line"></i>
                                     </div>
-                                    <h6 class="mt-3 mb-2 ms-3 ">Sales Chart</h6>
+                                    <h6 class="mt-3 mb-2 ms-3 ">Sales Chart For The Past 7 Days</h6>
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="row">
@@ -258,9 +288,6 @@ if (!isset ($_SESSION['Username'])) {
 
     <script>
         function loadAll() {
-            loadSalesTable();
-            loadTotalEggs();
-            loadTotalSales();
             loadChart();
         }
         function logout() {
@@ -277,87 +304,6 @@ if (!isset ($_SESSION['Username'])) {
                     window.location.href = 'assets/php/session_logout.php';
                 }
             })
-        }
-        $(".addSalesDate").flatpickr();
-        $('#saveSales').on('click', function () {
-            var sdate = $('#sdate').val();
-            var sqty = $('#sqty').val();
-            var stotal = $('#stotal').val();
-            $.ajax({
-                url: "assets/php/add_sales.php",
-                type: "POST",
-                data: {
-                    sdate: sdate,
-                    sqty: sqty,
-                    stotal: stotal,
-                },
-                cache: false,
-                success: function (dataResult) {
-                    $('#addSales').modal('toggle')
-                    $('#sdate').val('');
-                    $('#sqty').val('');
-                    $('#stotal').val('');
-                    var dataResult = JSON.parse(dataResult);
-                    if (dataResult.statusCode == 200) {
-                        Swal.fire({
-                            icon: 'success',
-                            text: 'Sales Updated Successfully',
-                        })
-                        loadAll();
-                    }
-                    else if (dataResult.statusCode == 201) {
-                        Swal.fire({
-                            icon: 'error',
-                            text: 'Something went Wrong, Please try again later',
-                        })
-                    }
-                }
-            });
-        });
-        function loadSalesTable() {
-            $.ajax({
-                url: "assets/php/load_sales_table.php",
-                type: "POST",
-                cache: false,
-                success: function (data) {
-                    $('#tblSales').html(data);
-                    var table = $('#tblSales').DataTable({
-                        order: [[4, 'desc']]
-                    });
-                }
-            });
-        }
-        function loadTotalEggs() {
-            $.ajax({
-                url: 'assets/php/load_total_egg.php',
-                success: function (data) {
-                    document.getElementById("totalEggSold").textContent = data;
-                }
-            })
-        }
-        function loadTotalSales() {
-            $.ajax({
-                url: 'assets/php/load_total_sales.php',
-                success: function (data) {
-                    document.getElementById("totalSalesCounter").textContent = data;
-                }
-            })
-        }
-        function deleteSales($___id) {
-            Swal.fire({
-                title: 'CONFIRMATION',
-                text: "Delete this Data?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'assets/php/delete_sales.php?id=' + $___id;
-                }
-            })
-
         }
         function loadChart() {
             var ctx = document.getElementById("mychart").getContext('2d');
