@@ -141,7 +141,8 @@ if (isset ($_SESSION['Username'])) {
                         }
                         else if (dataResult.statusCode == 205) {
                             window.location.href = "poultry_both/poultry_dashboard.php"
-                        } else {
+                        }
+                        else if (dataResult.statusCode == 202) {
                             Swal.fire({
                                 icon: "error",
                                 text: "Invalid Username / Password.",
