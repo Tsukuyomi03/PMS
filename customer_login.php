@@ -51,6 +51,25 @@ if (isset ($_SESSION["User"])) {
 </head>
 
 <body>
+    <div>
+        <?php if (isset ($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    text: '<?php echo $_SESSION['message'] ?>',
+                })
+            </script>
+        <?php elseif (isset ($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    text: '<?php echo $_SESSION['message'] ?>',
+                })
+            </script>
+        <?php endif; ?>
+        <?php unset($_SESSION['message']); ?>
+        <?php unset($_SESSION['status']); ?>
+    </div>
     <div class="wrapper d-flex">
         <div class="container-fluid" style="margin-top: 2%;">
             <div class="row">
