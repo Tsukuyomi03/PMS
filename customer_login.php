@@ -1,11 +1,11 @@
 <?php
 include ("assets/php/config.php");
 session_start();
-if (isset ($_SESSION["User"])) {
+if (isset($_SESSION["User"])) {
     header("Location: customer/customer_dashboard.php");
     exit();
 } else {
-    if (isset ($_POST['login'])) {
+    if (isset($_POST['login'])) {
         $username = $_POST['username'];
         $password = $_POST['password'];
 
@@ -52,14 +52,14 @@ if (isset ($_SESSION["User"])) {
 
 <body>
     <div>
-        <?php if (isset ($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
+        <?php if (isset($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
             <script>
                 Swal.fire({
                     icon: 'success',
                     text: '<?php echo $_SESSION['message'] ?>',
                 })
             </script>
-        <?php elseif (isset ($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
+        <?php elseif (isset($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
             <script>
                 Swal.fire({
                     icon: 'error',
@@ -105,7 +105,7 @@ if (isset ($_SESSION["User"])) {
                                 <div class="col-md-12" style="padding: 20px;">
                                     <a href="" data-toggle="modal" data-target="#modalforgotpass">Forgot
                                         Password</a>
-                                    <span style="float: right"><a href="epm_register.php">Create an
+                                    <span style="float: right"><a href="customer_register.php">Create an
                                             account?</a></span>
                                 </div>
                             </div>

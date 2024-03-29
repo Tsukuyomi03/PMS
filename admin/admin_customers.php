@@ -22,7 +22,8 @@ session_start();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.0/css/responsive.dataTables.css" />
 </head>
 <style>
     table.dataTable td.dt-type-numeric {
@@ -72,7 +73,7 @@ session_start();
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white active" href="admin_users.php">
+                    <a class="nav-link text-white" href="admin_users.php">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa-solid fa-user"></i>
                         </div>
@@ -80,7 +81,7 @@ session_start();
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white " href="admin_customers.php">
+                    <a class="nav-link text-white active" href="admin_customers.php">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa-solid fa-user"></i>
                         </div>
@@ -104,7 +105,7 @@ session_start();
                     <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
                         <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Admin</a>
                         </li>
-                        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Poultries</li>
+                        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Customers</li>
                     </ol>
                 </nav>
             </div>
@@ -112,16 +113,6 @@ session_start();
         <div class="container-fluid py-4">
             <div class="row">
                 <div class="col-lg-12 position-relative z-index-2">
-                    <div class="card card-plain mb-4">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="d-flex flex-column h-100">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-lg-3 col-sm-3">
                             <div class="card  mb-2">
@@ -131,8 +122,8 @@ session_start();
                                         <i class="fa-solid fa-users"></i>
                                     </div>
                                     <div class="text-end pt-1">
-                                        <p class="text-sm mb-0 text-capitalize">PENDING USERS</p>
-                                        <h4 class="mb-0" id="totalUsers">0</h4>
+                                        <p class="text-sm mb-0 text-capitalize">Unverified Customers</p>
+                                        <h4 class="mb-0" id="totalUnverified">0</h4>
                                     </div>
                                 </div>
                                 <hr class="dark horizontal my-0">
@@ -146,38 +137,8 @@ session_start();
                                         <i class="fa-solid fa-users"></i>
                                     </div>
                                     <div class="text-end pt-1">
-                                        <p class="text-sm mb-0 text-capitalize">Active Poultry Breeding Chickens</p>
-                                        <h4 class="mb-0" id="totalChicken">0</h4>
-                                    </div>
-                                </div>
-                                <hr class="dark horizontal my-0">
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-sm-3">
-                            <div class="card  mb-2">
-                                <div class="card-header p-3 pt-2">
-                                    <div
-                                        class="icon icon-lg icon-shape bg-gradient-secondary shadow-light shadow text-center border-radius-xl mt-n4 position-absolute">
-                                        <i class="fa-solid fa-users"></i>
-                                    </div>
-                                    <div class="text-end pt-1">
-                                        <p class="text-sm mb-0 text-capitalize">Active Poultry Selling Eggs</p>
-                                        <h4 class="mb-0" id="totalEgg">0</h4>
-                                    </div>
-                                </div>
-                                <hr class="dark horizontal my-0">
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-sm-3">
-                            <div class="card  mb-2">
-                                <div class="card-header p-3 pt-2">
-                                    <div
-                                        class="icon icon-lg icon-shape bg-gradient-secondary shadow-light shadow text-center border-radius-xl mt-n4 position-absolute">
-                                        <i class="fa-solid fa-users"></i>
-                                    </div>
-                                    <div class="text-end pt-1">
-                                        <p class="text-sm mb-0 text-capitalize">Active Poultry Selling and Breeding</p>
-                                        <h4 class="mb-0" id="totalBoth">0</h4>
+                                        <p class="text-sm mb-0 text-capitalize">Verified Customers</p>
+                                        <h4 class="mb-0" id="totalVerified">0</h4>
                                     </div>
                                 </div>
                                 <hr class="dark horizontal my-0">
@@ -185,94 +146,45 @@ session_start();
                         </div>
                     </div>
                     <div class="row mt-4">
-                        <div class="col-8">
+                        <div class="col-12">
                             <div class="card mb-4 ">
                                 <div class="d-flex">
                                     <div
                                         class="icon icon-shape icon-lg bg-gradient-warning shadow text-center border-radius-xl mt-n3 ms-4">
                                         <i class="fa-solid fa-table"></i>
                                     </div>
-                                    <h6 class="mt-3 mb-2 ms-3 ">Needs Approval</h6>
+                                    <h6 class="mt-3 mb-2 ms-3 ">List of Customers</h6>
                                 </div>
                                 <div class="card-body">
-                                    <table class="table table-hover" style="table-layout:fixed; width:100%"
-                                        id="tblPendingUsers">
+                                    <table class="table table-bordered" style="width:100%" id="tblCustomers">
                                         <thead>
                                             <tr>
-                                                <td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                                                    ID</td>
-                                                <td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                                                    Name</td>
-                                                <td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                                                    Surname</td>
-                                                <td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                                                    Address</td>
-                                                <td style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                                                    Contact</td>
-                                                <td>Action</td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            $sql = "SELECT * FROM tbl_users WHERE Status='Pending'";
-                                            $result = $db->query($sql);
-                                            while ($row = mysqli_fetch_array($result)) {
-                                                ?>
-                                                <tr>
-                                                    <td>
-                                                        <?= $row['User_ID']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= $row['Name']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= $row['Surname']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= $row['Address']; ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= $row['Contact']; ?>
-                                                    </td>
-                                                    <td><button class="btn btn-primary btn-sm"
-                                                            onclick="approve(<?= $row['User_ID']; ?>);">Approve</button>
-                                                    </td>
-                                                </tr>
-                                            <?php } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="card mb-4 ">
-                                <div class="d-flex">
-                                    <div
-                                        class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
-                                        <i class="fa-solid fa-table"></i>
-                                    </div>
-                                    <h6 class="mt-3 mb-2 ms-3 ">List Active Users</h6>
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-hover" style="table-layout:fixed; width:100%"
-                                        id="tblApprovedUsers">
-                                        <thead>
-                                            <tr>
-                                                <td>ID</td>
+                                                <td>Date Joined</td>
+                                                <td>Username</td>
                                                 <td>Name</td>
                                                 <td>Surname</td>
-                                                <td>Action</td>
+                                                <td>Street</td>
+                                                <td>Brgy</td>
+                                                <td>City</td>
+                                                <td>Province</td>
+                                                <td>Region</td>
+                                                <td>Contact</td>
+                                                <td>Email</td>
+                                                <td>Status</td>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $sql = "SELECT * FROM tbl_users WHERE Status='Approved'";
+                                            $sql = "SELECT * FROM tbl_customer";
                                             $result = $db->query($sql);
                                             while ($row = mysqli_fetch_array($result)) {
                                                 ?>
                                                 <tr>
                                                     <td>
-                                                        <?= $row['User_ID']; ?>
+                                                        <?= $row['Date_Created']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $row['Username']; ?>
                                                     </td>
                                                     <td>
                                                         <?= $row['Name']; ?>
@@ -281,8 +193,38 @@ session_start();
                                                         <?= $row['Surname']; ?>
                                                     </td>
                                                     <td>
-                                                        <a href="assets/php/redirect_page.php?id=<?= $row['User_ID']; ?>"
-                                                            class="btn btn-success btn-sm">View</a>
+                                                        <?= $row['Street']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $row['Brgy']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $row['City']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $row['Province']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $row['Region']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $row['Contact_No']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= $row['Email']; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php if ($row['Account_Status'] == "Unverified"): ?>
+                                                            <span
+                                                                style="border-radius:10%; background-color: gray; padding 5px;">
+                                                                <?= $row['Account_Status']; ?>
+                                                            </span>
+                                                        <?php elseif ($row['Account_Status'] == "Verified"): ?>
+                                                            <span
+                                                                style="border-radius:10%; background-color: green; color: white; padding:5px;">
+                                                                <?= $row['Account_Status']; ?>
+                                                            </span>
+                                                        <?php endif; ?>
                                                     </td>
                                                 </tr>
                                             <?php } ?>
@@ -304,8 +246,7 @@ session_start();
             </div>
         </div>
     </main>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"
-        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
         crossorigin="anonymous"></script>
@@ -315,25 +256,23 @@ session_start();
     <script src="assets/vendors/simplebar/js/simplebar.min.js"></script>
     <!-- Plugins and scripts required by this view-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.0/js/responsive.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.0/js/dataTables.responsive.js"></script>
     <script>
-        let table = new DataTable('#tblPendingUsers');
-        let table2 = new DataTable('#tblApprovedUsers');
-        function approve($___id) {
-            Swal.fire({
-                title: 'CONFIRMATION',
-                text: "Approve this user?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'assets/php/ajax_approve_users.php?oid=' + $___id;
-                }
-            })
-        }
+        $('#tblCustomers').DataTable({
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 0 },
+                { responsivePriority: 2, targets: 1 },
+                { responsivePriority: 3, targets: 2 },
+                { responsivePriority: 4, targets: 3 },
+                { responsivePriority: 5, targets: 9 },
+                { responsivePriority: 6, targets: 10 },
+                { responsivePriority: 7, targets: 11 },
+
+            ]
+        });
         function logout() {
             Swal.fire({
                 title: 'CONFIRMATION',
@@ -349,43 +288,25 @@ session_start();
                 }
             })
         }
+        function loadUnverifiedCustomers() {
+            $.ajax({
+                url: 'assets/php/load_unverified.php',
+                success: function (data) {
+                    document.getElementById("totalUnverified").textContent = data;
+                }
+            })
+        }
+        function loadVerifiedCustomers() {
+            $.ajax({
+                url: 'assets/php/load_verified.php',
+                success: function (data) {
+                    document.getElementById("totalVerified").textContent = data;
+                }
+            })
+        }
         function loadAll() {
-            loadPendingUsers();
-            loadBothUsers();
-            loadEggsUsers();
-            loadchickenUsers();
-        }
-        function loadPendingUsers() {
-            $.ajax({
-                url: 'assets/php/load_total_users2.php',
-                success: function (data) {
-                    document.getElementById("totalUsers").textContent = data;
-                }
-            })
-        }
-        function loadEggsUsers() {
-            $.ajax({
-                url: 'assets/php/load_users_egg.php',
-                success: function (data) {
-                    document.getElementById("totalEgg").textContent = data;
-                }
-            })
-        }
-        function loadchickenUsers() {
-            $.ajax({
-                url: 'assets/php/load_users_chicken.php',
-                success: function (data) {
-                    document.getElementById("totalChicken").textContent = data;
-                }
-            })
-        }
-        function loadBothUsers() {
-            $.ajax({
-                url: 'assets/php/load_users_both.php',
-                success: function (data) {
-                    document.getElementById("totalBoth").textContent = data;
-                }
-            })
+            loadUnverifiedCustomers();
+            loadVerifiedCustomers();
         }
     </script>
 </body>

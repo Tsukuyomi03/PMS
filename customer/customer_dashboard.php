@@ -1,12 +1,12 @@
 <?php
 include ("assets/php/config.php");
 session_start();
-if (!isset ($_SESSION['User'])) {
+if (!isset($_SESSION['User'])) {
     header("Location: ../customer_login.php");
     exit();
 
 } else {
-
+    $customer = $_SESSION['User'];
 }
 ?>
 <!DOCTYPE html>
@@ -35,14 +35,14 @@ if (!isset ($_SESSION['User'])) {
 
 <body class="g-sidenav-show  bg-gray-100">
     <div>
-        <?php if (isset ($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
+        <?php if (isset($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
             <script>
                 Swal.fire({
                     icon: 'success',
                     text: '<?php echo $_SESSION['message'] ?>',
                 })
             </script>
-        <?php elseif (isset ($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
+        <?php elseif (isset($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
             <script>
                 Swal.fire({
                     icon: 'error',
@@ -69,11 +69,19 @@ if (!isset ($_SESSION['User'])) {
         <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link text-white " href="customer_dashboard.php">
+                    <a class="nav-link text-white active" href="customer_dashboard.php">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa-solid fa-table-columns"></i>
                         </div>
                         <span class="nav-link-text ms-1">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="customer_poultry.php">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-egg"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Poultries</span>
                     </a>
                 </li>
             </ul>
@@ -101,41 +109,8 @@ if (!isset ($_SESSION['User'])) {
             </div>
         </nav>
         <div class="container-fluid py-4">
-            POULTRIES
             <div class="row">
-                <div class="col-lg-2">
-                    <div class="card card-plain mb-4">
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="d-flex flex-column h-100">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="card card-plain mb-4">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="d-flex flex-column h-100">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6 position-relative z-index-2">
-                    <button class="btn btn-primary" style="float:right;margin-top:2%; margin-left: 2%;"
-                        data-bs-toggle="modal" data-bs-target="#addSales"><i class="fa-solid fa-cart-plus"></i>
-                        Order</button>
-                    <br>
-                    <br>
-                    <br>
+                <div class="col-lg-12 position-relative z-index-2">
                     <div class="row">
                         <div class="col-12">
                             <div class="card mb-4 ">
@@ -144,14 +119,70 @@ if (!isset ($_SESSION['User'])) {
                                         class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
                                         <i class="fa-solid fa-chart-line"></i>
                                     </div>
-                                    <h6 class="mt-3 mb-2 ms-3 ">Sales Logs</h6>
+                                    <h6 class="mt-3 mb-2 ms-3 ">Orders Logs</h6>
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="row">
                                         <div class="col-lg-12 col-md-7">
                                             <div class="table-responsive" id="containerSalesTable">
-                                                <table class="table table-bordered" id="tblSales" style="width:100%">
-
+                                                <table class="table table-bordered" id="tblOrderLogs"
+                                                    style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Seller</th>
+                                                            <th>TYPE</th>
+                                                            <th>DESCRIPTION</th>
+                                                            <th>QUANTITY</th>
+                                                            <th>PRICE</th>
+                                                            <th>TOTAL</th>
+                                                            <th>STATUS</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                        $sql = "SELECT * FROM `tbl_orders` LEFT JOIN tbl_products ON tbl_orders.O_ProductID = tbl_products.P_ID WHERE O_Customer='$customer'";
+                                                        $result = $db->query($sql);
+                                                        while ($row = $result->fetch_assoc()) { ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <?php echo $row['O_Seller'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['P_Type'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['P_Description'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['O_QTY'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['P_Price'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['O_Total'] ?>
+                                                                </td>
+                                                                <td style="text-align:center;">
+                                                                    <?php if ($row['O_Status'] == "Pending"): ?>
+                                                                        <span
+                                                                            style="border-radius:10%; background-color: gray; padding:5px;">
+                                                                            <?php echo $row['O_Status'] ?>
+                                                                        </span>
+                                                                    <?php elseif ($row['O_Status'] == "Completed"): ?>
+                                                                        <span
+                                                                            style="border-radius:10%; background-color: green; padding:5px; color: White;">
+                                                                            <?php echo $row['O_Status'] ?>
+                                                                        </span>
+                                                                    <?php elseif ($row['O_Status'] == "Declined"): ?>
+                                                                        <span
+                                                                            style="border-radius:10%; background-color: red; padding:5px;color: White;">
+                                                                            <?php echo $row['O_Status'] ?>
+                                                                        </span>
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                            </tr>
+                                                        <?php } ?>
+                                                    </tbody>
                                                 </table>
                                             </div>
                                         </div>
@@ -164,6 +195,59 @@ if (!isset ($_SESSION['User'])) {
                 </div>
                 <div class="col-lg-6">
 
+                </div>
+            </div>
+            <div class="row">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="d-flex flex-column h-100">
+                                    <strong>
+                                        <span>POULTRIES</span> <a href="customer_poultry.php">
+                                            <span style="float:right;">SEE ALL <i class="fas fa-arrow-right"></i></span>
+                                        </a>
+                                    </strong>
+                                    <div class="row d-flex">
+                                        <?php
+                                        $poultries = "SELECT * FROM tbl_users LIMIT 3";
+                                        $result = $db->query($poultries);
+                                        while ($row = $result->fetch_assoc()) {
+                                            ?>
+                                            <div class="col-lg-3">
+                                                <a href="customer_poultry_select.php?id=<?php echo $row['User_ID'] ?>"
+                                                    style="text-decoration: none">
+                                                    <div class="card mb-3">
+                                                        <div class="row g-0">
+                                                            <div class="col-md-4">
+                                                                <img src="assets/images/person.jpg"
+                                                                    class="img-fluid rounded-start">
+                                                            </div>
+                                                            <div class="col-md-8">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title">
+                                                                        <?php echo $row['Name'] ?>
+                                                                        <?php echo $row['Surname'] ?>
+                                                                    </h5>
+                                                                    <?php if ($row['Type'] == 1): ?>
+                                                                        <p class="card-text">Chicken Seller</p>
+                                                                    <?php elseif ($row['Type'] == 2): ?>
+                                                                        <p class="card-text">Egg Seller</p>
+                                                                    <?php else: ?>
+                                                                        <p class="card-text">Chicken + Egg Seller </p>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -185,6 +269,7 @@ if (!isset ($_SESSION['User'])) {
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
+        let table = new DataTable('#tblOrderLogs');
         function logout() {
             Swal.fire({
                 title: 'CONFIRMATION',

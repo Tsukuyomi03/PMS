@@ -2,10 +2,11 @@
 include ("config.php");
 session_start();
 $user = $_SESSION["Username"];
-$sdate = $_POST['sdate'];
-$sqty = $_POST['sqty'];
-$stotal = $_POST['stotal'];
-$sql = "INSERT INTO `tbl_saleseggs`(`Sales_User`, `Sales_Quantity`, `Sales_Total`, `Sales_Date`) VALUES ('$user','$sqty','$stotal','$sdate')";
+$ptype = $_POST['ptype'];
+$pdes = $_POST['pdes'];
+$pprice = $_POST['pprice'];
+
+$sql = "INSERT INTO `tbl_products`(`P_Seller`, `P_Type`, `P_Description`, `P_Price`) VALUES ('$user','$ptype','$pdes','$pprice')";
 if (mysqli_query($db, $sql)) {
     echo json_encode(array("statusCode" => 200));
 } else {

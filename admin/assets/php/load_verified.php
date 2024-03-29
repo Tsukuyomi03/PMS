@@ -1,7 +1,7 @@
 <?php
 include ("config.php");
 session_start();
-$sql = "SELECT Count(`User_ID`) AS total_users FROM `tbl_users` WHERE `Status` = 'Approved' LIMIT 1";
+$sql = "SELECT Count(`C_ID`) AS total_users FROM `tbl_customer` WHERE `Account_Status` = 'Verified'";
 $result = $db->query($sql);
 $row = $result->fetch_assoc();
 echo $row['total_users'];
