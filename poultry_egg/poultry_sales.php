@@ -84,6 +84,14 @@ if (!isset($_SESSION['Username'])) {
                         <span class="nav-link-text ms-1">Sales</span>
                     </a>
                 </li>
+                <li class="nav-item ">
+                    <a class="nav-link text-white" href="poultry_inventory.php">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-egg"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Inventory</span>
+                    </a>
+                </li>
             </ul>
         </div>
         <div class="sidenav-footer position-absolute w-100 bottom-0 ">
@@ -110,44 +118,7 @@ if (!isset($_SESSION['Username'])) {
         </nav>
         <div class="container-fluid py-4">
             <div class="row">
-                <div class="col-lg-5 position-relative z-index-2">
-                    <button class="btn btn-primary" style="float:right;margin-top:2%; margin-left: 2%;"
-                        data-bs-toggle="modal" data-bs-target="#addProducts">Add Products</button>
-                    <br>
-                    <br>
-                    <br>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card mb-4 ">
-                                <div class="d-flex flex-row">
-                                    <div
-                                        class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
-                                        <i class="fa-solid fa-box"></i>
-                                    </div>
-                                    <h6 class="mt-3 mb-2 ms-3 ">List of Products</h6>
-                                </div>
-                                <div class="card-body p-3">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="table-responsive" id="">
-                                                <table class="table table-bordered" id="tblProducts" style="width:100%">
-
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <div class="col-lg-7 position-relative z-index-2">
-                    <button class="btn btn-primary" style="float:right;margin-top:2%; margin-left: 2%;"
-                        data-bs-toggle="modal" data-bs-target="#addSales">Add Sales</button>
-                    <br>
-                    <br>
-                    <br>
+                <div class="col-lg-6 position-relative z-index-2">
                     <div class="row">
                         <div class="col-12">
                             <div class="card mb-4 ">
@@ -156,7 +127,7 @@ if (!isset($_SESSION['Username'])) {
                                         class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
                                         <i class="fa-solid fa-chart-line"></i>
                                     </div>
-                                    <h6 class="mt-3 mb-2 ms-3 ">Sales Logs</h6>
+                                    <h6 class="mt-3 mb-2 ms-3 ">Order Logs</h6>
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="row">
@@ -219,6 +190,89 @@ if (!isset($_SESSION['Username'])) {
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-6 position-relative z-index-2">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card mb-4 ">
+                                <div class="d-flex flex-row">
+                                    <div
+                                        class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </div>
+                                    <h6 class="mt-3 mb-2 ms-3 ">Sales Logs</h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-7">
+                                            <div class="table-responsive" id="containerSalesTable">
+                                                <table class="table table-bordered" id="tblOrders"
+                                                    style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Seller</th>
+                                                            <th>TYPE</th>
+                                                            <th>DESCRIPTION</th>
+                                                            <th>QUANTITY</th>
+                                                            <th>PRICE</th>
+                                                            <th>TOTAL</th>
+                                                            <th>STATUS</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                        $sql = "SELECT * FROM `tbl_orders` LEFT JOIN tbl_products ON tbl_orders.O_ProductID = tbl_products.P_ID WHERE O_Seller='$user'";
+                                                        $result = $db->query($sql);
+                                                        while ($row = $result->fetch_assoc()) { ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <?php echo $row['O_Seller'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['P_Type'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['P_Description'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['O_QTY'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['P_Price'] ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo $row['O_Total'] ?>
+                                                                </td>
+                                                                <td style="text-align:center;">
+                                                                    <?php if ($row['O_Status'] == "Pending"): ?>
+                                                                        <span
+                                                                            style="border-radius:10%; background-color: gray; padding:5px;">
+                                                                            <?php echo $row['O_Status'] ?>
+                                                                        </span>
+                                                                    <?php elseif ($row['O_Status'] == "Completed"): ?>
+                                                                        <span
+                                                                            style="border-radius:10%; background-color: green; padding:5px; color: White;">
+                                                                            <?php echo $row['O_Status'] ?>
+                                                                        </span>
+                                                                    <?php elseif ($row['O_Status'] == "Declined"): ?>
+                                                                        <span
+                                                                            style="border-radius:10%; background-color: red; padding:5px;color: White;">
+                                                                            <?php echo $row['O_Status'] ?>
+                                                                        </span>
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                            </tr>
+                                                        <?php } ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -270,7 +324,8 @@ if (!isset($_SESSION['Username'])) {
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
-        let table = new DataTable('#tblSales');
+        let table = new DataTable('#tblOrders');
+        let table2 = new DataTable('#tblSales');
         function loadAll() {
 
             loadProductTable();

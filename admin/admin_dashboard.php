@@ -1,3 +1,14 @@
+<?php
+include ("assets/php/config.php");
+session_start();
+if (isset($_SESSION["Admin"])){
+
+}
+else{
+    header("Location: ../index_admin.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -55,7 +66,7 @@
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa-solid fa-user"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Poultries</span>
+                        <span class="nav-link-text ms-1">Customers</span>
                     </a>
                 </li>
             </ul>

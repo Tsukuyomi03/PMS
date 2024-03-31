@@ -108,6 +108,14 @@ if (!isset($_SESSION['Username'])) {
                         <span class="nav-link-text ms-1">Sales</span>
                     </a>
                 </li>
+                <li class="nav-item ">
+                    <a class="nav-link text-white" href="poultry_inventory.php">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-egg"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Inventory</span>
+                    </a>
+                </li>
             </ul>
         </div>
         <div class="sidenav-footer position-absolute w-100 bottom-0 ">
@@ -134,9 +142,9 @@ if (!isset($_SESSION['Username'])) {
         </nav>
         <div class="container-fluid py-4">
             <div class="row">
-                <div class="col-lg-6 position-relative z-index-2">
+                <div class="col-lg-12 position-relative z-index-2">
                     <div class="row">
-                        <div class="col-lg-6 col-sm-3">
+                        <div class="col-lg-4 col-sm-4">
                             <div class="card  mb-2">
                                 <div class="card-header p-3 pt-2">
                                     <div
@@ -151,7 +159,7 @@ if (!isset($_SESSION['Username'])) {
                                 <hr class="dark horizontal my-0">
                             </div>
                         </div>
-                        <div class="col-lg-6 col-sm-3">
+                        <div class="col-lg-4 col-sm-4">
                             <div class="card  mb-2">
                                 <div class="card-header p-3 pt-2">
                                     <div
@@ -161,6 +169,21 @@ if (!isset($_SESSION['Username'])) {
                                     <div class="text-end pt-1">
                                         <p class="text-sm mb-0 text-capitalize">Total Sales</p>
                                         <h4 class="mb-0" id="totalSalesCounter">0</h4>
+                                    </div>
+                                </div>
+                                <hr class="dark horizontal my-0">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-sm-4">
+                            <div class="card  mb-2">
+                                <div class="card-header p-3 pt-2">
+                                    <div
+                                        class="icon icon-lg icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-xl mt-n4 position-absolute">
+                                        <i class="fa-solid fa-box"></i>
+                                    </div>
+                                    <div class="text-end pt-1">
+                                        <p class="text-sm mb-0 text-capitalize">Total Products</p>
+                                        <h4 class="mb-0" id="totalProductsCounter">0</h4>
                                     </div>
                                 </div>
                                 <hr class="dark horizontal my-0">
@@ -279,6 +302,7 @@ if (!isset($_SESSION['Username'])) {
             loadTotalSales();
             loadChart();
             loadChart2();
+            loadTotalProducts();
         }
         function logout() {
             Swal.fire({
@@ -348,7 +372,13 @@ if (!isset($_SESSION['Username'])) {
             $.ajax({
                 url: 'assets/php/load_total_egg.php',
                 success: function (data) {
-                    document.getElementById("totalEggSold").textContent = data;
+                    if(data == ""){
+                        document.getElementById("totalEggSold").textContent = 0;
+                    }
+                    else{
+                        document.getElementById("totalEggSold").textContent = data;
+                    }
+                    
                 }
             })
         }
@@ -356,7 +386,25 @@ if (!isset($_SESSION['Username'])) {
             $.ajax({
                 url: 'assets/php/load_total_sales.php',
                 success: function (data) {
-                    document.getElementById("totalSalesCounter").textContent = data;
+                    if(data == ""){
+                        document.getElementById("totalSalesCounter").textContent = 0;
+                    }
+                    else{
+                        document.getElementById("totalSalesCounter").textContent = data;
+                    }
+                }
+            })
+        }
+        function loadTotalProducts() {
+            $.ajax({
+                url: 'assets/php/load_total_products.php',
+                success: function (data) {
+                    if(data == ""){
+                        document.getElementById("totalProductsCounter").textContent = 0;
+                    }
+                    else{
+                        document.getElementById("totalProductsCounter").textContent = data;
+                    }
                 }
             })
         }

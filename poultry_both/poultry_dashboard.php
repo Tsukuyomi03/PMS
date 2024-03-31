@@ -1,12 +1,36 @@
 <?php
 include ("assets/php/config.php");
 session_start();
-if (!isset ($_SESSION['Username'])) {
+if (!isset($_SESSION['Username'])) {
     header("Location: ../index.php");
     exit();
 
 } else {
     $user = $_SESSION['Username'];
+    $data1 = '';
+    $data2 = '';
+    $sql = "SELECT  DATE_FORMAT(`O_Date`,'%m-%d-%y') AS `Current`, SUM(`O_QTY`) AS `Total` FROM `tbl_orders` LEFT JOIN tbl_products ON tbl_orders.O_ProductID = tbl_products.P_ID WHERE `O_Date` BETWEEN CURDATE()-7 AND CURDATE() AND `O_Seller`='$user' AND O_Status='Completed' GROUP BY `Current`";
+    $result = mysqli_query($db, $sql);
+    while ($row = mysqli_fetch_array($result)) {
+
+        $data1 = $data1 . '"' . $row['Current'] . '",';
+        $data2 = $data2 . '"' . $row['Total'] . '",';
+    }
+    $data1 = trim($data1, ",");
+    $data2 = trim($data2, ",");
+
+
+    $data3 = '';
+    $data4 = '';
+    $sql2 = "SELECT  DATE_FORMAT(`O_Date`,'%m-%d-%y') AS `Current`, SUM(`O_Total`) AS `Total` FROM `tbl_orders` LEFT JOIN tbl_products ON tbl_orders.O_ProductID = tbl_products.P_ID WHERE `O_Date` BETWEEN CURDATE()-7 AND CURDATE() AND `O_Seller`='$user' AND O_Status='Completed' GROUP BY `Current`";
+    $result2 = mysqli_query($db, $sql2);
+    while ($row2 = mysqli_fetch_array($result2)) {
+
+        $data3 = $data3 . '"' . $row2['Current'] . '",';
+        $data4 = $data4 . '"' . $row2['Total'] . '",';
+    }
+    $data3 = trim($data3, ",");
+    $data4 = trim($data4, ",");
 }
 ?>
 <!DOCTYPE html>
@@ -35,14 +59,14 @@ if (!isset ($_SESSION['Username'])) {
 
 <body class="g-sidenav-show  bg-gray-100" onload="loadAll();">
     <div>
-        <?php if (isset ($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
+        <?php if (isset($_SESSION["status"]) && $_SESSION['status'] == 'success'): ?>
             <script>
                 Swal.fire({
                     icon: 'success',
                     text: '<?php echo $_SESSION['message'] ?>',
                 })
             </script>
-        <?php elseif (isset ($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
+        <?php elseif (isset($_SESSION["status"]) && $_SESSION['status'] == 'error'): ?>
             <script>
                 Swal.fire({
                     icon: 'error',
@@ -68,7 +92,7 @@ if (!isset ($_SESSION['Username'])) {
         <hr class="horizontal light mt-0 mb-2">
         <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
             <ul class="navbar-nav">
-                <li class="nav-item">
+                <li class="nav-item ">
                     <a class="nav-link text-white active" href="poultry_dashboard.php">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa-solid fa-table-columns"></i>
@@ -76,12 +100,20 @@ if (!isset ($_SESSION['Username'])) {
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item ">
                     <a class="nav-link text-white" href="poultry_sales.php">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa-solid fa-coins"></i>
                         </div>
                         <span class="nav-link-text ms-1">Sales</span>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link text-white" href="poultry_inventory.php">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-egg"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Inventory</span>
                     </a>
                 </li>
             </ul>
@@ -109,7 +141,129 @@ if (!isset ($_SESSION['Username'])) {
             </div>
         </nav>
         <div class="container-fluid py-4">
-
+            <div class="row">
+                <div class="col-lg-12 position-relative z-index-2">
+                    <div class="row">
+                    <div class="col-lg-3 col-sm-3">
+                            <div class="card  mb-2">
+                                <div class="card-header p-3 pt-2">
+                                    <div
+                                        class="icon icon-lg icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-xl mt-n4 position-absolute">
+                                        <i class="fa-solid fa-egg"></i>
+                                    </div>
+                                    <div class="text-end pt-1">
+                                        <p class="text-sm mb-0 text-capitalize">Total Eggs Sold</p>
+                                        <h4 class="mb-0" id="totalChickenCounter">0</h4>
+                                    </div>
+                                </div>
+                                <hr class="dark horizontal my-0">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-3">
+                            <div class="card  mb-2">
+                                <div class="card-header p-3 pt-2">
+                                    <div
+                                        class="icon icon-lg icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-xl mt-n4 position-absolute">
+                                        <i class="fa-solid fa-drumstick-bite"></i>
+                                    </div>
+                                    <div class="text-end pt-1">
+                                        <p class="text-sm mb-0 text-capitalize">Total Chicken Sold</p>
+                                        <h4 class="mb-0" id="totalEggSold">0</h4>
+                                    </div>
+                                </div>
+                                <hr class="dark horizontal my-0">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-3">
+                            <div class="card  mb-2">
+                                <div class="card-header p-3 pt-2">
+                                    <div
+                                        class="icon icon-lg icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-xl mt-n4 position-absolute">
+                                        <i class="fa-solid fa-coins"></i>
+                                    </div>
+                                    <div class="text-end pt-1">
+                                        <p class="text-sm mb-0 text-capitalize">Total Sales</p>
+                                        <h4 class="mb-0" id="totalSalesCounter">0</h4>
+                                    </div>
+                                </div>
+                                <hr class="dark horizontal my-0">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-3">
+                            <div class="card  mb-2">
+                                <div class="card-header p-3 pt-2">
+                                    <div
+                                        class="icon icon-lg icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-xl mt-n4 position-absolute">
+                                        <i class="fa-solid fa-box"></i>
+                                    </div>
+                                    <div class="text-end pt-1">
+                                        <p class="text-sm mb-0 text-capitalize">Total Products</p>
+                                        <h4 class="mb-0" id="totalProductsCounter">0</h4>
+                                    </div>
+                                </div>
+                                <hr class="dark horizontal my-0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card mb-4 ">
+                                <div class="d-flex">
+                                    <div
+                                        class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </div>
+                                    <h6 class="mt-3 mb-2 ms-3 ">Weekly Inventory Chart</h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-7">
+                                            <canvas id="mychart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card mb-4 ">
+                                <div class="d-flex">
+                                    <div
+                                        class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </div>
+                                    <h6 class="mt-3 mb-2 ms-3 ">Weekly Sales Chart</h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-7">
+                                            <canvas id="mychart2"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="globe" class="position-absolute end-0 top-10 mt-sm-3 mt-7 me-lg-7">
+                    <canvas width="700" height="600"
+                        class="w-lg-100 h-lg-100 w-75 h-75 me-lg-0 me-n10 mt-lg-5"></canvas>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -128,6 +282,15 @@ if (!isset ($_SESSION['Username'])) {
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
+        function loadAll() {
+            loadSalesTable();
+            loadTotalEggs();
+            loadTotalSales();
+            loadChart();
+            loadChart2();
+            loadTotalProducts();
+            loadTotalChicken();
+        }
         function logout() {
             Swal.fire({
                 title: 'CONFIRMATION',
@@ -142,6 +305,208 @@ if (!isset ($_SESSION['Username'])) {
                     window.location.href = 'assets/php/session_logout.php';
                 }
             })
+        }
+        $(".addSalesDate").flatpickr();
+        $('#saveSales').on('click', function () {
+            var sdate = $('#sdate').val();
+            var sqty = $('#sqty').val();
+            var stotal = $('#stotal').val();
+            $.ajax({
+                url: "assets/php/add_sales.php",
+                type: "POST",
+                data: {
+                    sdate: sdate,
+                    sqty: sqty,
+                    stotal: stotal,
+                },
+                cache: false,
+                success: function (dataResult) {
+                    $('#addSales').modal('toggle')
+                    $('#sdate').val('');
+                    $('#sqty').val('');
+                    $('#stotal').val('');
+                    var dataResult = JSON.parse(dataResult);
+                    if (dataResult.statusCode == 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: 'Sales Updated Successfully',
+                        })
+                        loadAll();
+                    }
+                    else if (dataResult.statusCode == 201) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'Something went Wrong, Please try again later',
+                        })
+                    }
+                }
+            });
+        });
+        function loadSalesTable() {
+            $.ajax({
+                url: "assets/php/load_sales_table.php",
+                type: "POST",
+                cache: false,
+                success: function (data) {
+                    $('#tblSales').html(data);
+                    var table = $('#tblSales').DataTable({
+                        order: [[4, 'desc']]
+                    });
+                }
+            });
+        }
+        function loadTotalEggs() {
+            $.ajax({
+                url: 'assets/php/load_total_egg.php',
+                success: function (data) {
+                    if(data == ""){
+                        document.getElementById("totalEggSold").textContent = 0;
+                    }
+                    else{
+                        document.getElementById("totalEggSold").textContent = data;
+                    }
+                    
+                }
+            })
+        }
+        function loadTotalSales() {
+            $.ajax({
+                url: 'assets/php/load_total_sales.php',
+                success: function (data) {
+                    if(data == ""){
+                        document.getElementById("totalSalesCounter").textContent = 0;
+                    }
+                    else{
+                        document.getElementById("totalSalesCounter").textContent = data;
+                    }
+                }
+            })
+        }
+        function loadTotalChicken() {
+            $.ajax({
+                url: 'assets/php/load_total_chicken.php',
+                success: function (data) {
+                    if(data == ""){
+                        document.getElementById("totalChickenCounter").textContent = 0;
+                    }
+                    else{
+                        document.getElementById("totalChickenCounter").textContent = data;
+                    }
+                }
+            })
+        }
+        function loadTotalProducts() {
+            $.ajax({
+                url: 'assets/php/load_total_products.php',
+                success: function (data) {
+                    if(data == ""){
+                        document.getElementById("totalProductsCounter").textContent = 0;
+                    }
+                    else{
+                        document.getElementById("totalProductsCounter").textContent = data;
+                    }
+                }
+            })
+        }
+        function deleteSales($___id) {
+            Swal.fire({
+                title: 'CONFIRMATION',
+                text: "Delete this Data?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'assets/php/delete_sales.php?id=' + $___id;
+                }
+            })
+
+        }
+        function loadChart() {
+            var ctx = document.getElementById("mychart").getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    color: "pink",
+                    labels: [<?php echo $data1; ?>],
+                    datasets: [
+                        {
+                            label: 'Product Sold',
+                            data: [<?php echo $data2; ?>,],
+                            backgroundColor: 'transparent',
+                            borderColor: 'Pink',
+                            borderWidth: 3,
+                            tension: 0.1,
+
+                        },
+                    ]
+                },
+                animation: {
+                    animateScale: true
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: false,
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function (value) {
+                                    if (Number.isInteger(value)) {
+                                        return value;
+                                    }
+                                },
+                            }
+                        }],
+                    }
+                }
+            });
+        }
+        function loadChart2() {
+            var ctx = document.getElementById("mychart2").getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    color: "pink",
+                    labels: [<?php echo $data3; ?>],
+                    datasets: [
+                        {
+                            label: 'Sales',
+                            data: [<?php echo $data4; ?>,],
+                            backgroundColor: 'transparent',
+                            borderColor: 'Pink',
+                            borderWidth: 3,
+                            tension: 0.1,
+
+                        },
+                    ]
+                },
+                animation: {
+                    animateScale: true
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: false,
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function (value) {
+                                    if (Number.isInteger(value)) {
+                                        return value;
+                                    }
+                                },
+                            }
+                        }],
+                    }
+                }
+            });
         }
     </script>
 </body>

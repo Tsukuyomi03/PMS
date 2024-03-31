@@ -9,6 +9,7 @@ $sql = "SELECT * FROM tbl_admin WHERE Username='$uname' and `Password`='$pword'"
 $result = $db->query($sql);
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
+    $_SESSION['Admin'] = $row['Username'];
     echo json_encode(array("statusCode" => 200));
 } else {
     echo json_encode(array("statusCode" => 201));

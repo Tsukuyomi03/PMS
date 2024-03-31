@@ -1,6 +1,13 @@
 <?php
 include ("assets/php/config.php");
 session_start();
+if (isset($_SESSION["Admin"])){
+
+}
+else{
+    header("Location: ../index_admin.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

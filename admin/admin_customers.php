@@ -1,6 +1,13 @@
 <?php
 include ("assets/php/config.php");
 session_start();
+if (isset($_SESSION["Admin"])){
+
+}
+else{
+    header("Location: ../index_admin.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -216,7 +223,7 @@ session_start();
                                                     <td>
                                                         <?php if ($row['Account_Status'] == "Unverified"): ?>
                                                             <span
-                                                                style="border-radius:10%; background-color: gray; padding 5px;">
+                                                                style="border-radius:10%; background-color: gray; padding: 5px;">
                                                                 <?= $row['Account_Status']; ?>
                                                             </span>
                                                         <?php elseif ($row['Account_Status'] == "Verified"): ?>

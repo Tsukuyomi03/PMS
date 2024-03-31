@@ -1,33 +1,55 @@
 <?php
 include ("assets/php/config.php");
 session_start();
-
-$id = $_GET['id'];
-$sql = "SELECT * FROM tbl_users WHERE User_ID='$id'";
-$result = $db->query($sql);
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $user = $row['Username'];
-    $dc = $row['Date_Created'];
-    $name = $row['Name'];
-    $sname = $row['Surname'];
-    $add = $row['Address'];
-    $contact = $row['Contact'];
-    $data1 = '';
-    $data2 = '';
-    $sql = "SELECT  DATE_FORMAT(`Sales_Date`,'%m-%d-%y') AS `Current`, SUM(`Sales_Quantity`) AS `Total` FROM `tbl_saleseggs`  WHERE `Sales_Date` BETWEEN CURDATE()-7 AND CURDATE() AND `Sales_User`='$user' GROUP BY `Current`";
-    $result = mysqli_query($db, $sql);
-    while ($row = mysqli_fetch_array($result)) {
-
-        $data1 = $data1 . '"' . $row['Current'] . '",';
-        $data2 = $data2 . '"' . $row['Total'] . '",';
-    }
-    $data1 = trim($data1, ",");
-    $data2 = trim($data2, ",");
-} else {
-    header("Location: " . $path . "admin/admin_users.php");
+if (!isset($_SESSION["Admin"])){
+    header("Location: ../index_admin.php");
+    exit();
 }
-
+else{
+    $id = $_GET['id'];
+    $sql3 = "SELECT * FROM tbl_users WHERE User_ID='$id'";
+    $result3 = $db->query($sql3);
+    if ($result3->num_rows > 0) {
+        $row3 = $result3->fetch_assoc();
+        $user = $row3['Username'];
+        $dc = $row3['Date_Created'];
+        $name = $row3['Name'];
+        $sname = $row3['Surname'];
+        $add = $row3['Address'];
+        $contact = $row3['Contact'];
+        
+    
+        $data1 = '';
+        $data2 = '';
+        $sql = "SELECT  DATE_FORMAT(`O_Date`,'%m-%d-%y') AS `Current`, SUM(`O_QTY`) AS `Total` FROM `tbl_orders` LEFT JOIN tbl_products ON tbl_orders.O_ProductID = tbl_products.P_ID WHERE `O_Date` BETWEEN CURDATE()-7 AND CURDATE() AND `O_Seller`='$user' AND O_Status='Completed' GROUP BY `Current`";
+        $result = mysqli_query($db, $sql);
+        while ($row = mysqli_fetch_array($result)) {
+    
+            $data1 = $data1 . '"' . $row['Current'] . '",';
+            $data2 = $data2 . '"' . $row['Total'] . '",';
+        }
+        $data1 = trim($data1, ",");
+        $data2 = trim($data2, ",");
+    
+    
+        $data3 = '';
+        $data4 = '';
+        $sql2 = "SELECT  DATE_FORMAT(`O_Date`,'%m-%d-%y') AS `Current`, SUM(`O_Total`) AS `Total` FROM `tbl_orders` LEFT JOIN tbl_products ON tbl_orders.O_ProductID = tbl_products.P_ID WHERE `O_Date` BETWEEN CURDATE()-7 AND CURDATE() AND `O_Seller`='$user' AND O_Status='Completed' GROUP BY `Current`";
+        $result2 = mysqli_query($db, $sql2);
+        while ($row2 = mysqli_fetch_array($result2)) {
+    
+            $data3 = $data3 . '"' . $row2['Current'] . '",';
+            $data4 = $data4 . '"' . $row2['Total'] . '",';
+        }
+        $data3 = trim($data3, ",");
+        $data4 = trim($data4, ",");
+    
+    
+    } else {
+        header("Location: " . $path . "admin/admin_users.php");
+    }
+   
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -78,11 +100,19 @@ if ($result->num_rows > 0) {
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white " href="admin_users.php">
+                    <a class="nav-link text-white active" href="admin_users.php">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa-solid fa-user"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Users</span>
+                        <span class="nav-link-text ms-1">Poultries</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="admin_customers.php">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Customers</span>
                     </a>
                 </li>
             </ul>
@@ -161,7 +191,12 @@ if ($result->num_rows > 0) {
 
                     </div>
                     <div class="row" style="margin-top:2%">
-                        <div class="col-lg-6 col-sm-3">
+                        
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                    <div class="col-lg-6 col-sm-3" style="margin-top:2%">
                             <div class="card  mb-2">
                                 <div class="card-header p-3 pt-2">
                                     <div
@@ -171,19 +206,23 @@ if ($result->num_rows > 0) {
                                     <div class="text-end pt-1">
                                         <p class="text-sm mb-0 text-capitalize">Total Egg Sold</p>
                                         <?php
-                                        $sql4 = "SELECT SUM(`Sales_Quantity`) AS total_qty FROM `tbl_saleseggs` WHERE `Sales_User` = '$user'";
+                                        $sql4 = "SELECT SUM(O_QTY) AS totalEggs FROM `tbl_orders` LEFT JOIN tbl_products ON tbl_orders.O_ProductID = tbl_products.P_ID WHERE O_Seller='$user' AND O_Status='Completed'";
                                         $result4 = $db->query($sql4);
                                         $row4 = $result4->fetch_assoc();
                                         ?>
                                         <h4 class="mb-0" id="totalEggSold">
-                                            <?php echo $row4['total_qty']; ?>
+                                            <?php if($row4['totalEggs'] == ''): ?>
+                                                0
+                                            <?php else:?>
+                                                <?php echo $row4['totalEggs']; ?>
+                                            <?php endif; ?>
                                         </h4>
                                     </div>
                                 </div>
                                 <hr class="dark horizontal my-0">
                             </div>
                         </div>
-                        <div class="col-lg-6 col-sm-3">
+                        <div class="col-lg-6 col-sm-3 " style="margin-top:2%">
                             <div class="card  mb-2">
                                 <div class="card-header p-3 pt-2">
                                     <div
@@ -193,16 +232,73 @@ if ($result->num_rows > 0) {
                                     <div class="text-end pt-1">
                                         <p class="text-sm mb-0 text-capitalize">Total Sales</p>
                                         <?php
-                                        $sql6 = "SELECT SUM(`Sales_Total`) AS total_sales FROM `tbl_saleseggs` WHERE `Sales_User` = '$user'";
+                                        $sql6 = "SELECT SUM(O_Total) AS totalSales FROM `tbl_orders` LEFT JOIN tbl_products ON tbl_orders.O_ProductID = tbl_products.P_ID WHERE O_Seller='$user' AND O_Status='Completed'";
                                         $result6 = $db->query($sql6);
                                         $row6 = $result6->fetch_assoc();
                                         ?>
                                         <h4 class="mb-0" id="totalSalesCounter">
-                                            <?php echo $row6['total_sales']; ?>
+                                        <?php if($row6['totalSales'] == ''): ?>
+                                                0
+                                            <?php else:?>
+                                                <?php echo $row6['totalSales']; ?>
+                                            <?php endif; ?>
                                         </h4>
                                     </div>
                                 </div>
                                 <hr class="dark horizontal my-0">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-3" style="margin-top:2%">
+                            <div class="card  mb-2">
+                                <div class="card-header p-3 pt-2">
+                                    <div
+                                        class="icon icon-lg icon-shape bg-gradient-dark shadow-dark shadow text-center border-radius-xl mt-n4 position-absolute">
+                                        <i class="fa-solid fa-box"></i>
+                                    </div>
+                                    <div class="text-end pt-1">
+                                        <p class="text-sm mb-0 text-capitalize">Total Products</p>
+                                        <?php
+                                        $sql7 = "SELECT COUNT(P_ID) AS totalProducts FROM `tbl_products` WHERE P_Seller='$user'";
+                                        $result7 = $db->query($sql7);
+                                        $row7 = $result7->fetch_assoc();
+                                        ?>
+                                        <h4 class="mb-0" id="totalSalesCounter">
+                                        <?php if($row7['totalProducts'] == ''): ?>
+                                                0
+                                            <?php else:?>
+                                                <?php echo $row7['totalProducts']; ?>
+                                            <?php endif; ?>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <hr class="dark horizontal my-0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+        </div>
+        <div class="row">
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card mb-4 ">
+                                <div class="d-flex">
+                                    <div
+                                        class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </div>
+                                    <h6 class="mt-3 mb-2 ms-3 ">Weekly Inventory Chart</h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-7">
+                                            <canvas id="mychart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -216,12 +312,12 @@ if ($result->num_rows > 0) {
                                         class="icon icon-shape icon-lg bg-gradient-success shadow text-center border-radius-xl mt-n3 ms-4">
                                         <i class="fa-solid fa-chart-line"></i>
                                     </div>
-                                    <h6 class="mt-3 mb-2 ms-3 ">Sales Chart For The Past 7 Days</h6>
+                                    <h6 class="mt-3 mb-2 ms-3 ">Weekly Sales Chart</h6>
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="row">
                                         <div class="col-lg-12 col-md-7">
-                                            <canvas id="mychart"></canvas>
+                                            <canvas id="mychart2"></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -230,17 +326,6 @@ if ($result->num_rows > 0) {
                     </div>
                 </div>
             </div>
-        </div>
-        <div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div id="globe" class="position-absolute end-0 top-10 mt-sm-3 mt-7 me-lg-7">
-                    <canvas width="700" height="600"
-                        class="w-lg-100 h-lg-100 w-75 h-75 me-lg-0 me-n10 mt-lg-5"></canvas>
-                </div>
-            </div>
-        </div>
     </main>
 
     <!--=====THIS MODAL IS FOR ADDING SALES=====-->
@@ -289,6 +374,7 @@ if ($result->num_rows > 0) {
     <script>
         function loadAll() {
             loadChart();
+            loadChart2();
         }
         function logout() {
             Swal.fire({
@@ -316,6 +402,48 @@ if ($result->num_rows > 0) {
                         {
                             label: 'Egg Sold',
                             data: [<?php echo $data2; ?>,],
+                            backgroundColor: 'transparent',
+                            borderColor: 'Pink',
+                            borderWidth: 3,
+                            tension: 0.1,
+
+                        },
+                    ]
+                },
+                animation: {
+                    animateScale: true
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: false,
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function (value) {
+                                    if (Number.isInteger(value)) {
+                                        return value;
+                                    }
+                                },
+                            }
+                        }],
+                    }
+                }
+            });
+        }
+        function loadChart2() {
+            var ctx = document.getElementById("mychart2").getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    color: "pink",
+                    labels: [<?php echo $data3; ?>],
+                    datasets: [
+                        {
+                            label: 'Sales',
+                            data: [<?php echo $data4; ?>,],
                             backgroundColor: 'transparent',
                             borderColor: 'Pink',
                             borderWidth: 3,
